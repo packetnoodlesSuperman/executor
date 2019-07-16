@@ -1,5 +1,6 @@
 package com.bob.executor.thread_local;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -14,29 +15,131 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ThreadLocal<T> {
 
-    private final int threadLocalHashCode = nextHashCode();
+    public static void main(String[] args) {
+        final java.lang.ThreadLocal local = new java.lang.ThreadLocal(){
+            @Override
+            protected Object initialValue() {
+                return new String("test");
+            }
+        };
 
-    private static AtomicInteger nextHashCode = new AtomicInteger();
-    private static final int HASH_INCREMENT = 0x61c88647;
-    private int nextHashCode() {
-        // 原子方式将当前值与输入值相加并返回结果
-        return nextHashCode.getAndAdd(HASH_INCREMENT);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                local.set("001");
+                System.out.println(local.get());
+
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                local.set("002");
+                System.out.println(local.get());
+
+            }
+        }).start();
     }
 
-    public ThreadLocal() { }
 
-    public T get() {
-        Thread t = Thread.currentThread();
-        getMap(t);
-        return null;
-    }
-
-    ThreadLocalMap getMap(Thread t) {
+//
+//    private final int threadLocalHashCode = nextHashCode();
+//
+//    private static AtomicInteger nextHashCode = new AtomicInteger();
+//    private static final int HASH_INCREMENT = 0x61c88647;
+//    private int nextHashCode() {
+//        // 原子方式将当前值与输入值相加并返回结果
+//        return nextHashCode.getAndAdd(HASH_INCREMENT);
+//    }
+//
+//    public ThreadLocal() { }
+//
+//    public void set(T value) {
+//        Thread t = Thread.currentThread();
+//        ThreadLocalMap map = getMap(t);
+//        if (map != null) {
+//            map.set(this, value);
+//        } else {
+//            createMap(t, value);
+//        }
+//    }
+//
+//    private void createMap(Thread t, T firstValue) {
+//        t.threadLocals = new ThreadLocalMap(this, firstValue);
+//    }
+//
+//    /**
+//     * @return 查询
+//     */
+//    public T get() {
+//        Thread t = Thread.currentThread();
+//        ThreadLocalMap map = getMap(t);
+//        if (map != null) {
+//            ThreadLocalMap.Entry e = map.getEntry(this);
+//            if (e != null) {
+//                T result = (T) e.value;
+//                return result;
+//            }
+//        }
+//        return setInitialValue();
+//    }
+//
+//    private T setInitialValue() {
+//        T value = initialValue();
+//        Thread t = Thread.currentThread();
+//        ThreadLocalMap map = getMap(t);
+//        if (map != null) {
+//            map.set(this, value);
+//        } else {
+//            createMap(t, value);
+//        }
+//        return value;
+//    }
+//
+//    private T initialValue() {
+//        return null;
+//    }
+//
+//
+//    ThreadLocalMap getMap(Thread t) {
 //        return t.threadLocals;
-        return null;
-    }
-
-    static class ThreadLocalMap {
-
-    }
+//    }
+//
+//
+//    /**
+//     * 内部类
+//     */
+//    static class ThreadLocalMap {
+//
+//        static class Entry extends WeakReference<java.lang.ThreadLocal<?>> {
+//
+//            Object value;
+//
+//
+//            public Entry(ThreadLocal<?> k, Object v) {
+//                super(k);
+//                value = v;
+//            }
+//        }
+//
+//        private static final int INITIAL_CAPACITY = 16;
+//        private Entry[] table;
+//
+//        ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
+//            table = new Entry[INITIAL_CAPACITY];
+//            int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
+//            table[i] = new Entry(firstKey, firstValue);
+//            size = 1;
+//            setThreshold(INITIAL_CAPACITY);
+//        }
+//
+//        public void set(ThreadLocal<?> tThreadLocal, Object value) {
+//
+//        }
+//
+//        private Entry getEntry(ThreadLocal<?> key) {
+//            return null;
+//        }
+//    }
 }
